@@ -27,13 +27,8 @@ Each upgrade increases in cost, starting at **$500** and doubling with each leve
 At **Level 5**, the final option to **Enhance** becomes available for **$30,000**.
 
 ### Enhancement Mode  
-At Level 5, the button changes to say `"Enhance"` instead of `"Upgrade"`.  
+At Level 5, gain the ability to **Enhance**.  
 Enhancing sets the mixing time to a flat **1 second**.
-
-### Smart UI Integration  
-- Displays current level or `"Enhanced"` status
-- Switches button text to `"Enhance"` or `"Max Level"` automatically
-- Keeps everything in a single upgrade panel
 
 ---
 
