@@ -43,3 +43,6 @@ Enhancing sets the mixing time to a flat **1 second**.
 
 1. Build the project (`.dll`) targeting `.NET 6`
 2. Drop the compiled `.dll` into SteamLibrary\steamapps\common\Schedule I\Mods
+
+Made by **Dom**
+If you have any questions feel free to reach out to me on discord, I'm always available!
