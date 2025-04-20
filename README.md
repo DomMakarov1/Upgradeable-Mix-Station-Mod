@@ -1,5 +1,4 @@
-# schedule-il2cpp-example
-Example template and instructions for modding Schedule I IL2CPP version
+Dom's Upgradeable Mix Station mod adds a fully-featured upgrade and enhancement system to the Mixing Station Mk2 in Schedule I, giving players more control and progression in their drug manufacturing empire.
 
 ## Requirements
 - The game requires your mod to target the net6 framework, this is defined in the ExampleMod.csproj file TargetFramework property and net6 must be installed before building the library. Visual Studio will prompt you to install it if not present.
@@ -15,3 +14,17 @@ Example template and instructions for modding Schedule I IL2CPP version
       - NOTE: You will need to use that specific namespace when referring to the game namespace related things by: using Il2CppScheduleOne.Player;
 
 - After these steps are done, you are ready to code your own logics. See the Template MainMod.cs file for the basic requirements for Harmony and MelonLoader.
+
+## NOT COMPATIBLE WITH MONO, ONLY IL2CPP
+
+## Features
+-Upgradeable Mixing Station
+Upgrade your Mixing Station up to Level 5, reducing mixing times with each level.
+-Progressive Costs
+Each upgrade costs more, starting at $500 and doubling until Level 5. Once maxed, you’ll unlock the ability to enhance the station.
+-Enhancement Mode
+At Level 5, the upgrade button transforms into an “Enhance” option for $30,000. Enhancing instantly reduces mixing time to 1 second.
+
+## Installation
+Drop the compiled .dll into your MelonLoader Mods/folder.
+Launch the game — the mod activates automatically when a Mixing Station Mk2 is used.
