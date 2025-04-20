@@ -1,30 +1,50 @@
-Dom's Upgradeable Mix Station mod adds a fully-featured upgrade and enhancement system to the Mixing Station Mk2 in Schedule I, giving players more control and progression in their drug manufacturing empire.
+# Dom's Upgradeable Mix Station Mod
+
+**Dom's Upgradeable Mix Station mod** adds a fully-featured upgrade and enhancement system to the **Mixing Station Mk2** in *Schedule I*, giving players more control and progression in their drug manufacturing empire.
+
+---
 
 ## Requirements
-- The game requires your mod to target the net6 framework, this is defined in the ExampleMod.csproj file TargetFramework property and net6 must be installed before building the library. Visual Studio will prompt you to install it if not present.
-- Then install the 2 required packages, Visual Studio toolbar -> Project -> Manage NuGet Packages
-  - Search for LavaGang.MelonLoader and install it
-  - Search for Lib.Harmony and install it
 
-- Now you must additionally have MelonLoader installed for the game, if it is not installed do it now.
-- Start your game once and let MelonLoader build the il2cpp assemblies. After this is done the game will start and then close the game.
-  - Then you must navigate to the following directory: C:\Program Files (x86)\Steam\steamapps\common\Schedule I\MelonLoader\Il2CppAssemblies
-  - From here you will need two files: Assembly-CSharp.dll and UnityEngine.CoreModule.dll, move these two files into the libs folder. (Also specified in the .csproj file)
-      - NOTE: Now if you inspect that that Assembly-CSharp.dll file with dnSpy, you will find that the namespace for ScheduleOne has become Il2CppScheduleOne
-      - NOTE: You will need to use that specific namespace when referring to the game namespace related things by: using Il2CppScheduleOne.Player;
+- Ensure **MelonLoader** is installed for the game.
+- Use the latest version of the game
 
-- After these steps are done, you are ready to code your own logics. See the Template MainMod.cs file for the basic requirements for Harmony and MelonLoader.
+---
 
-## NOT COMPATIBLE WITH MONO, ONLY IL2CPP
+## Compatibility
+
+**Not compatible with Mono builds** — Only works with **IL2CPP** builds.
+
+---
 
 ## Features
--Upgradeable Mixing Station
-Upgrade your Mixing Station up to Level 5, reducing mixing times with each level.
--Progressive Costs
-Each upgrade costs more, starting at $500 and doubling until Level 5. Once maxed, you’ll unlock the ability to enhance the station.
--Enhancement Mode
-At Level 5, the upgrade button transforms into an “Enhance” option for $30,000. Enhancing instantly reduces mixing time to 1 second.
+
+### Upgradeable Mixing Station  
+Upgrade your Mixing Station up to **Level 5**, reducing mixing times with each level.
+
+### Progressive Costs  
+Each upgrade increases in cost, starting at **$500** and doubling with each level.  
+At **Level 5**, the final option to **Enhance** becomes available for **$30,000**.
+
+### Enhancement Mode  
+At Level 5, the button changes to say `"Enhance"` instead of `"Upgrade"`.  
+Enhancing sets the mixing time to a flat **1 second**.
+
+### Smart UI Integration  
+- Displays current level or `"Enhanced"` status
+- Switches button text to `"Enhance"` or `"Max Level"` automatically
+- Keeps everything in a single upgrade panel
+
+---
 
 ## Installation
-Drop the compiled .dll into your MelonLoader Mods/folder.
-Launch the game — the mod activates automatically when a Mixing Station Mk2 is used.
+
+**EITHER**
+
+1. Download the latest release of the mod from https://github.com/DomMakarov1/Upgradeable-Mix-Station-Mod/releases
+2. Drag and drop **Upgradeable Mix Station Mod.dll** into SteamLibrary\steamapps\common\Schedule I\Mods
+
+**OR**
+
+1. Build the project (`.dll`) targeting `.NET 6`
+2. Drop the compiled `.dll` into your game’s
