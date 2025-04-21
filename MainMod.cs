@@ -11,6 +11,7 @@ using System.IO;
 using System;
 using System.Text.Json;
 using MelonLoader.Utils;
+using System.Collections;
 
 [assembly: MelonInfo(typeof(UpgradeableMixStationMod.MixStationUpgradeMod), UpgradeableMixStationMod.BuildInfo.Name, UpgradeableMixStationMod.BuildInfo.Version, UpgradeableMixStationMod.BuildInfo.Author)]
 [assembly: MelonGame("TVGS", "Schedule I")]
@@ -96,6 +97,7 @@ namespace UpgradeableMixStationMod
             if (currentBalance < data.Cost)
             {
                 MelonLogger.Msg("[Upgrade] Not enough money.");
+                ShowInsufficientFunds(stationCanvas);
                 return;
             }
 
@@ -116,6 +118,33 @@ namespace UpgradeableMixStationMod
             }
 
             MelonLogger.Msg($"[Upgrade] Upgraded to level {data.Level}");
+        }
+
+        private static void ShowInsufficientFunds(MixingStationCanvas stationCanvas)
+        {
+            if (!stationData.TryGetValue(stationCanvas, out var data)) return;
+            
+            var button = data.UpgradePanel.GetComponentInChildren<Button>();
+            if (button == null) return;
+            
+            var buttonText = button.GetComponentInChildren<Text>();
+            if (buttonText == null) return;
+            
+            string originalText = buttonText.text;
+            bool wasInteractable = button.interactable;
+            
+            buttonText.text = "Insufficient Funds";
+            button.interactable = false;
+            
+            MelonCoroutines.Start(ResetButtonText(button, buttonText, originalText, wasInteractable));
+        }
+        
+        private static System.Collections.IEnumerator ResetButtonText(Button button, Text buttonText, string originalText, bool originalState)
+        {
+            yield return new WaitForSeconds(3.0f);
+            
+            buttonText.text = originalText;
+            button.interactable = originalState;
         }
 
         public static void Enhance(MixingStationCanvas stationCanvas, bool fromLoad = false)
