@@ -6,6 +6,11 @@ using UnityEngine.Events;
 using Il2CppScheduleOne.UI.Stations;
 using Il2CppScheduleOne.Money;
 using Il2CppScheduleOne.ObjectScripts;
+using System.Collections.Generic;
+using System.IO;
+using System;
+using System.Text.Json;
+using MelonLoader.Utils;
 
 [assembly: MelonInfo(typeof(UpgradeableMixStationMod.MixStationUpgradeMod), UpgradeableMixStationMod.BuildInfo.Name, UpgradeableMixStationMod.BuildInfo.Version, UpgradeableMixStationMod.BuildInfo.Author)]
 [assembly: MelonGame("TVGS", "Schedule I")]
@@ -18,7 +23,7 @@ namespace UpgradeableMixStationMod
         public const string Name = "Dom's Upgradeable Mix Station Mod";
         public const string Description = "Adds upgrades to the Mixing Station Mk2";
         public const string Author = "Dom";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
     }
 
     public class StationUpgradeData
@@ -28,83 +33,107 @@ namespace UpgradeableMixStationMod
         public bool Enhanced = false;
         public Text LevelText;
         public GameObject UpgradePanel;
-        public GameObject EnhancePanel;
+    }
+
+    public class GlobalUpgradeState
+    {
+        public int Level { get; set; } = 1;
+        public bool Enhanced { get; set; } = false;
     }
 
     public class MixStationUpgradeMod : MelonMod
     {
         public static Dictionary<MixingStationCanvas, StationUpgradeData> stationData = new();
+        private static readonly string SavePath = Path.Combine(MelonEnvironment.UserDataDirectory, "MixStationUpgradeSave.json");
+        private static GlobalUpgradeState globalState = new();
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("Dom's Ugradeable Mix Station Mod loaded.");
+            LoadUpgradeData();
+            MelonLogger.Msg("Dom's Upgradeable Mix Station Mod loaded.");
+        }
+
+        public static void SaveUpgradeData()
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(globalState, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(SavePath, json);
+                MelonLogger.Msg("[Save] Upgrade data saved.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[Save] Failed to save upgrade data: {ex}");
+            }
+        }
+
+        public static void LoadUpgradeData()
+        {
+            try
+            {
+                if (File.Exists(SavePath))
+                {
+                    var json = File.ReadAllText(SavePath);
+                    globalState = JsonSerializer.Deserialize<GlobalUpgradeState>(json) ?? new GlobalUpgradeState();
+                    MelonLogger.Msg($"[Load] Loaded upgrade level {globalState.Level}, enhanced: {globalState.Enhanced}");
+                }
+                else
+                {
+                    MelonLogger.Msg("[Load] No saved data found. Using defaults.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[Load] Failed to load upgrade data: {ex}");
+            }
         }
 
         public static void Upgrade(MixingStationCanvas stationCanvas)
         {
-            if (!stationData.ContainsKey(stationCanvas)) return;
-
-            var data = stationData[stationCanvas];
+            if (!stationData.TryGetValue(stationCanvas, out var data)) return;
 
             float currentBalance = MoneyManager.Instance.cashBalance;
             if (currentBalance < data.Cost)
             {
-                MelonLogger.Msg("[Upgrade] Not enough money to upgrade.");
+                MelonLogger.Msg("[Upgrade] Not enough money.");
                 return;
             }
 
             MoneyManager.Instance.ChangeCashBalance(-data.Cost, true, true);
             data.Level++;
+            globalState.Level = data.Level;
+            SaveUpgradeData();
 
             if (data.Level == 5)
             {
                 data.Cost = 30000;
-
-                if (data.LevelText != null)
-                    data.LevelText.text = $"Mixing Table Level: {data.Level}\nNext Upgrade: ${data.Cost}";
-
-                var upgradeButton = data.UpgradePanel.GetComponentInChildren<Button>();
-                var buttonText = upgradeButton.GetComponentInChildren<Text>();
-                if (upgradeButton != null && buttonText != null)
-                {
-                    buttonText.text = "Enhance";
-                    upgradeButton.onClick.RemoveAllListeners();
-                    upgradeButton.onClick.AddListener((UnityAction)(() => Enhance(stationCanvas)));
-                }
+                UpdateUIToEnhance(data, stationCanvas);
             }
             else
             {
                 data.Cost *= 2;
-
-                if (data.LevelText != null)
-                    data.LevelText.text = $"Mixing Table Level: {data.Level}\nNext Upgrade: ${data.Cost}";
+                UpdateLevelText(data);
             }
 
             MelonLogger.Msg($"[Upgrade] Upgraded to level {data.Level}");
         }
 
-        public static void Enhance(MixingStationCanvas stationCanvas)
+        public static void Enhance(MixingStationCanvas stationCanvas, bool fromLoad = false)
         {
-            if (!stationData.ContainsKey(stationCanvas)) return;
+            if (!stationData.TryGetValue(stationCanvas, out var data)) return;
 
-            var data = stationData[stationCanvas];
-
-            if (data.Enhanced)
+            // Skip the money checks and enhancements if already enhanced (unless fromLoad is true)
+            if (data.Enhanced && !fromLoad)
             {
                 MelonLogger.Msg("[Enhance] Already enhanced.");
                 return;
             }
 
-            float currentBalance = MoneyManager.Instance.cashBalance;
-            if (currentBalance < 30000)
-            {
-                MelonLogger.Msg("[Enhance] Not enough money to enhance.");
-                return;
-            }
-
-            MoneyManager.Instance.ChangeCashBalance(-30000, true, true);
+            // Perform the UI update part of enhancement, but don't subtract money or re-check conditions
             data.Enhanced = true;
+            globalState.Enhanced = true;
 
+            // Now apply the UI changes like the original Enhance() method
             var upgradeButton = data.UpgradePanel.GetComponentInChildren<Button>();
             var buttonText = upgradeButton.GetComponentInChildren<Text>();
             if (upgradeButton != null && buttonText != null)
@@ -116,18 +145,35 @@ namespace UpgradeableMixStationMod
                     buttonImage.color = new Color(0.75f, 0.75f, 0.75f, 0.5f);
             }
 
+            // Update the level text to reflect enhanced state
             if (data.LevelText != null)
                 data.LevelText.text = "Mixing Table: Enhanced";
 
-            MelonLogger.Msg("[Enhance] Enhancement complete. Max level reached.");
+            // If fromLoad is true, save the state immediately to reflect the change
+            if (fromLoad)
+            {
+                SaveUpgradeData();
+                MelonLogger.Msg("[Enhance] Enhancement complete (loaded state).");
+            }
+            else
+            {
+                MelonLogger.Msg("[Enhance] Enhancement complete.");
+            }
         }
+
 
         public static void CreateLevelUI(MixingStationCanvas stationCanvas)
         {
             if (stationData.ContainsKey(stationCanvas)) return;
 
+            var upgradeData = new StationUpgradeData
+            {
+                Level = globalState.Level,
+                Enhanced = globalState.Enhanced,
+                Cost = globalState.Level >= 5 ? 30000 : 500 * (int)Mathf.Pow(2, globalState.Level - 1)
+            };
+
             Transform parent = stationCanvas.transform;
-            var upgradeData = new StationUpgradeData();
 
             GameObject panelGO = new GameObject("UpgradePanel");
             upgradeData.UpgradePanel = panelGO;
@@ -136,60 +182,81 @@ namespace UpgradeableMixStationMod
             panelRect.sizeDelta = new Vector2(260, 130);
             panelRect.localPosition = new Vector3(-400f, 0f, 0f);
 
-            Image panelImage = panelGO.AddComponent<Image>();
-            panelImage.color = new Color(0, 0, 0, 0.6f);
-
-            Outline outline = panelGO.AddComponent<Outline>();
-            outline.effectColor = Color.white;
-            outline.effectDistance = new Vector2(3, 3);
+            panelGO.AddComponent<Image>().color = new Color(0, 0, 0, 0.6f);
+            panelGO.AddComponent<Outline>().effectColor = Color.white;
 
             GameObject textGO = new GameObject("LevelText");
             textGO.transform.SetParent(panelGO.transform, false);
-            Text levelText = textGO.AddComponent<Text>();
+            var levelText = textGO.AddComponent<Text>();
             levelText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             levelText.fontSize = 18;
             levelText.alignment = TextAnchor.MiddleCenter;
-            levelText.text = $"Mixing Table Level: {upgradeData.Level}\nNext Upgrade: ${upgradeData.Cost}";
             upgradeData.LevelText = levelText;
+            UpdateLevelText(upgradeData);
 
-            RectTransform textRect = textGO.GetComponent<RectTransform>();
+            var textRect = textGO.GetComponent<RectTransform>();
             textRect.anchoredPosition = new Vector2(0, 30);
             textRect.sizeDelta = new Vector2(240, 50);
 
             GameObject buttonGO = new GameObject("UpgradeButton");
             buttonGO.transform.SetParent(panelGO.transform, false);
-            Button upgradeButton = buttonGO.AddComponent<Button>();
+            var upgradeButton = buttonGO.AddComponent<Button>();
 
-            Image buttonImage = buttonGO.AddComponent<Image>();
+            var buttonImage = buttonGO.AddComponent<Image>();
             buttonImage.color = new Color(0.85f, 0.85f, 0.85f);
 
-            RectTransform buttonRect = buttonGO.GetComponent<RectTransform>();
+            var buttonRect = buttonGO.GetComponent<RectTransform>();
             buttonRect.anchoredPosition = new Vector2(0, -25);
             buttonRect.sizeDelta = new Vector2(180, 45);
 
             GameObject buttonTextGO = new GameObject("ButtonText");
             buttonTextGO.transform.SetParent(buttonGO.transform, false);
-            Text buttonText = buttonTextGO.AddComponent<Text>();
+            var buttonText = buttonTextGO.AddComponent<Text>();
             buttonText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             buttonText.fontSize = 18;
             buttonText.alignment = TextAnchor.MiddleCenter;
-            buttonText.text = "Upgrade";
+            var textRect2 = buttonTextGO.GetComponent<RectTransform>();
+            textRect2.anchoredPosition = Vector2.zero;
+            textRect2.sizeDelta = buttonRect.sizeDelta;
 
-            RectTransform buttonTextRect = buttonTextGO.GetComponent<RectTransform>();
-            buttonTextRect.anchoredPosition = Vector2.zero;
-            buttonTextRect.sizeDelta = buttonRect.sizeDelta;
-
-            upgradeButton.onClick.AddListener((UnityAction)(() => Upgrade(stationCanvas)));
-
-            if (upgradeData.Level == 5)
+            if (upgradeData.Level == 5 && !upgradeData.Enhanced)
             {
-                upgradeButton.onClick.RemoveAllListeners();
-                upgradeButton.onClick.AddListener((UnityAction)(() => Enhance(stationCanvas)));
                 buttonText.text = "Enhance";
-                upgradeData.Cost = 30000;
+                upgradeButton.onClick.AddListener((UnityAction)(() => Enhance(stationCanvas)));
+            }
+            else if (upgradeData.Enhanced)
+            {
+                buttonText.text = "Max Level";
+                upgradeButton.interactable = false;
+                buttonImage.color = new Color(0.75f, 0.75f, 0.75f, 0.5f);
+            }
+            else
+            {
+                buttonText.text = "Upgrade";
+                upgradeButton.onClick.AddListener((UnityAction)(() => Upgrade(stationCanvas)));
             }
 
             stationData[stationCanvas] = upgradeData;
+        }
+
+        private static void UpdateLevelText(StationUpgradeData data)
+        {
+            if (data.LevelText != null)
+                data.LevelText.text = $"Mixing Table Level: {data.Level}\nNext Upgrade: ${data.Cost}";
+        }
+
+        private static void UpdateUIToEnhance(StationUpgradeData data, MixingStationCanvas stationCanvas)
+        {
+            UpdateLevelText(data);
+
+            var upgradeButton = data.UpgradePanel.GetComponentInChildren<Button>();
+            var buttonText = upgradeButton.GetComponentInChildren<Text>();
+            if (upgradeButton != null && buttonText != null)
+            {
+                buttonText.text = "Enhance";
+                upgradeButton.onClick.RemoveAllListeners();
+                upgradeButton.onClick.AddListener((UnityAction)(() => Enhance(stationCanvas)));
+            }
         }
     }
 
@@ -225,23 +292,17 @@ namespace UpgradeableMixStationMod
                 return;
             }
 
-            var quantityLabel = __instance.QuantityLabel;
             int quantity = 0;
-
-            if (quantityLabel != null)
+            var label = __instance.QuantityLabel?.text;
+            if (!string.IsNullOrEmpty(label))
             {
-                string labelText = quantityLabel.text;
-                if (!string.IsNullOrEmpty(labelText))
-                {
-                    string digits = System.Text.RegularExpressions.Regex.Match(labelText, "\\d+").Value;
-                    if (int.TryParse(digits, out int parsed))
-                        quantity = parsed;
-                }
+                string digits = System.Text.RegularExpressions.Regex.Match(label, "\\d+").Value;
+                int.TryParse(digits, out quantity);
             }
 
             if (quantity <= 0)
             {
-                MelonLogger.Warning("[MixingStart Patch] Could not determine quantity. Aborting auto-finish.");
+                MelonLogger.Warning("[MixingStart Patch] Invalid quantity. Aborting.");
                 return;
             }
 
@@ -256,7 +317,7 @@ namespace UpgradeableMixStationMod
             }
 
             MelonCoroutines.Start(FinishEarly(__instance, timeToFinish));
-            MelonLogger.Msg($"[MixingStart Patch] Mix of {quantity} set to finish in {timeToFinish}s (Level {level})");
+            MelonLogger.Msg($"[MixingStart Patch] Mix of {quantity} will finish in {timeToFinish}s (Level {level})");
         }
 
         private static System.Collections.IEnumerator FinishEarly(MixingStationMk2 station, float totalTime)
@@ -267,19 +328,16 @@ namespace UpgradeableMixStationMod
             while (elapsed < totalTime)
             {
                 float remaining = Mathf.Max(0f, totalTime - elapsed);
-                string desiredText = $"{remaining:0.#}s remaining";
+                string display = $"{remaining:0.#}s remaining";
 
-                if (progressLabel != null && progressLabel.text != desiredText)
-                {
-                    progressLabel.text = desiredText;
-                }
+                if (progressLabel != null)
+                    progressLabel.text = display;
 
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
             station.MixingDone();
-
             if (progressLabel != null)
                 progressLabel.text = "Mixing Complete!";
 

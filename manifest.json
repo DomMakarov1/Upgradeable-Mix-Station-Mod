@@ -1,7 +1,7 @@
 {
   "name": "Doms_MixStation_Upgrade_Mod",
   "description": "Adds a progression system to the Mixing Station Mk2 with upgrades and enhancements.",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "dependencies": [
     "LavaGang-MelonLoader-0.5.7",
     "pardeike-HarmonyLib-2.2.2"
