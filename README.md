@@ -13,7 +13,7 @@
 
 ## Compatibility
 
-**Not compatible with Mono builds** — Only works with **IL2CPP** builds.
+**Works with Mono mods, cannot guarantee compatability with Il2Cpp
 
 ---
 
