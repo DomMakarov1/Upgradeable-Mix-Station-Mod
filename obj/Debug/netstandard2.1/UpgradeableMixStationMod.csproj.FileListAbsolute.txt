@@ -1,0 +1,10 @@
+E:\upgradeable mix station\MixingStationUpgrades\bin\Debug\netstandard2.1\UpgradeableMixStationMod.deps.json
+E:\upgradeable mix station\MixingStationUpgrades\bin\Debug\netstandard2.1\UpgradeableMixStationMod.dll
+E:\upgradeable mix station\MixingStationUpgrades\bin\Debug\netstandard2.1\UpgradeableMixStationMod.pdb
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.csproj.AssemblyReference.cache
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.GeneratedMSBuildEditorConfig.editorconfig
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.AssemblyInfoInputs.cache
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.AssemblyInfo.cs
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.csproj.CoreCompileInputs.cache
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.dll
+E:\upgradeable mix station\MixingStationUpgrades\obj\Debug\netstandard2.1\UpgradeableMixStationMod.pdb

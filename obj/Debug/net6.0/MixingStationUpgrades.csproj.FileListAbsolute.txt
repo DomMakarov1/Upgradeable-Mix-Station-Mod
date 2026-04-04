@@ -1,0 +1,12 @@
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.csproj.AssemblyReference.cache
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.AssemblyInfoInputs.cache
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.AssemblyInfo.cs
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.csproj.CoreCompileInputs.cache
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\bin\Debug\net6.0\UpgradeableMixStationMod.deps.json
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\bin\Debug\net6.0\UpgradeableMixStationMod.dll
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\bin\Debug\net6.0\UpgradeableMixStationMod.pdb
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.dll
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\refint\UpgradeableMixStationMod.dll
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\UpgradeableMixStationMod.pdb
+C:\Users\dedbr\OneDrive\Desktop\upgradeable mix station\UpgradeableMixStationMod\obj\Debug\net6.0\ref\UpgradeableMixStationMod.dll
